@@ -1,0 +1,129 @@
+// https://github.com/hotgluebanjo
+
+// https://blog.pkh.me/p/22-understanding-selective-coloring-in-adobe-photoshop.html
+// https://github.com/prod80/prod80-ReShade-Repository/blob/master/Shaders/PD80_04_Selective_Color.fx
+
+DEFINE_UI_PARAMS(g_red_c, Red: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_red_m, Red: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_red_y, Red: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_red_k, Red: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_yel_c, Yellow: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_yel_m, Yellow: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_yel_y, Yellow: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_yel_k, Yellow: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_grn_c, Green: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_grn_m, Green: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_grn_y, Green: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_grn_k, Green: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_cyn_c, Cyan: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_cyn_m, Cyan: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_cyn_y, Cyan: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_cyn_k, Cyan: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_blu_c, Blue: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_blu_m, Blue: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_blu_y, Blue: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_blu_k, Blue: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_mag_c, Magenta: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_mag_m, Magenta: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_mag_y, Magenta: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_mag_k, Magenta: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_wht_c, White: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_wht_m, White: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_wht_y, White: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_wht_k, White: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_neu_c, Neutral: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_neu_m, Neutral: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_neu_y, Neutral: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_neu_k, Neutral: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_blk_c, Black: Cyan, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_blk_m, Black: Magenta, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_blk_y, Black: Yellow, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+DEFINE_UI_PARAMS(g_blk_k, Black: Black, DCTLUI_SLIDER_FLOAT, 0.0, -1.0, 1.0, 0.001)
+
+DEFINE_UI_PARAMS(g_mode, Mode, DCTLUI_COMBO_BOX, 0, {ABSOLUTE, RELATIVE}, {Absolute, Relative})
+
+__DEVICE__ inline float adjust(float scale, float v, float adj, float blk, float mode) {
+    return _clampf(((-1.0f - adj) * blk - adj) * (1.0f - v * mode), -v, 1.0f - v) * scale;
+}
+
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) {
+    float3 input = make_float3(p_R, p_G, p_B);
+
+    float min_v = _fminf(input.x, _fminf(input.y, input.z));
+    float max_v = _fmaxf(input.x, _fmaxf(input.y, input.z));
+    float mid_v = (input.x + input.y + input.z) - min_v - max_v;
+
+    float s_rgb = max_v - mid_v;
+    float s_cmy = mid_v - min_v;
+    float s_neu = 1.0f - (_fabs(max_v - 0.5f) + _fabs(min_v - 0.5f));
+    float s_wht = (min_v - 0.5f) * 2.0f;
+    float s_blk = (0.5f - max_v) * 2.0f;
+
+    float mode = (float)g_mode;
+
+    float3 ts = input;
+
+    if (max_v == input.x) {
+        ts.x = ts.x + adjust(s_rgb, ts.x, g_red_c, g_red_k, mode);
+        ts.y = ts.y + adjust(s_rgb, ts.y, g_red_m, g_red_k, mode);
+        ts.z = ts.z + adjust(s_rgb, ts.z, g_red_y, g_red_k, mode);
+    }
+
+    if (min_v == input.z) {
+        ts.x = ts.x + adjust(s_cmy, ts.x, g_yel_c, g_yel_k, mode);
+        ts.y = ts.y + adjust(s_cmy, ts.y, g_yel_m, g_yel_k, mode);
+        ts.z = ts.z + adjust(s_cmy, ts.z, g_yel_y, g_yel_k, mode);
+    }
+
+    if (max_v == input.y) {
+        ts.x = ts.x + adjust(s_rgb, ts.x, g_grn_c, g_grn_k, mode);
+        ts.y = ts.y + adjust(s_rgb, ts.y, g_grn_m, g_grn_k, mode);
+        ts.z = ts.z + adjust(s_rgb, ts.z, g_grn_y, g_grn_k, mode);
+    }
+
+    if (min_v == input.x) {
+        ts.x = ts.x + adjust(s_cmy, ts.x, g_cyn_c, g_cyn_k, mode);
+        ts.y = ts.y + adjust(s_cmy, ts.y, g_cyn_m, g_cyn_k, mode);
+        ts.z = ts.z + adjust(s_cmy, ts.z, g_cyn_y, g_cyn_k, mode);
+    }
+
+    if (max_v == input.z) {
+        ts.x = ts.x + adjust(s_rgb, ts.x, g_blu_c, g_blu_k, mode);
+        ts.y = ts.y + adjust(s_rgb, ts.y, g_blu_m, g_blu_k, mode);
+        ts.z = ts.z + adjust(s_rgb, ts.z, g_blu_y, g_blu_k, mode);
+    }
+
+    if (min_v == input.y) {
+        ts.x = ts.x + adjust(s_cmy, ts.x, g_mag_c, g_mag_k, mode);
+        ts.y = ts.y + adjust(s_cmy, ts.y, g_mag_m, g_mag_k, mode);
+        ts.z = ts.z + adjust(s_cmy, ts.z, g_mag_y, g_mag_k, mode);
+    }
+
+    if (min_v >= 0.5f) {
+        ts.x = ts.x + adjust(s_wht, ts.x, g_wht_c, g_wht_k, mode);
+        ts.y = ts.y + adjust(s_wht, ts.y, g_wht_m, g_wht_k, mode);
+        ts.z = ts.z + adjust(s_wht, ts.z, g_wht_y, g_wht_k, mode);
+    }
+
+    if (max_v > 0.0f && min_v < 1.0f) {
+        ts.x = ts.x + adjust(s_neu, ts.x, g_neu_c, g_neu_k, mode);
+        ts.y = ts.y + adjust(s_neu, ts.y, g_neu_m, g_neu_k, mode);
+        ts.z = ts.z + adjust(s_neu, ts.z, g_neu_y, g_neu_k, mode);
+    }
+
+    if (max_v < 0.5f) {
+        ts.x = ts.x + adjust(s_blk, ts.x, g_blk_c, g_blk_k, mode);
+        ts.y = ts.y + adjust(s_blk, ts.y, g_blk_m, g_blk_k, mode);
+        ts.z = ts.z + adjust(s_blk, ts.z, g_blk_y, g_blk_k, mode);
+    }
+
+    return ts;
+}

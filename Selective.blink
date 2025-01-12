@@ -1,0 +1,135 @@
+// https://github.com/hotgluebanjo
+
+// https://blog.pkh.me/p/22-understanding-selective-coloring-in-adobe-photoshop.html
+// https://github.com/prod80/prod80-ReShade-Repository/blob/master/Shaders/PD80_04_Selective_Color.fx
+
+inline float adjust(float scale, float v, float adj, float blk, int method) {
+    return clamp(((-1.0f - adj) * blk - adj) * (1.0f - v * method), -v, 1.0f - v) * scale;
+}
+
+kernel Selective : ImageComputationKernel<ePixelWise> {
+    Image<eRead, eAccessPoint, eEdgeClamped> src;
+    Image<eWrite> dst;
+
+    param:
+        float red_c;
+        float red_m;
+        float red_y;
+        float red_k;
+
+        float yel_c;
+        float yel_m;
+        float yel_y;
+        float yel_k;
+
+        float grn_c;
+        float grn_m;
+        float grn_y;
+        float grn_k;
+
+        float cyn_c;
+        float cyn_m;
+        float cyn_y;
+        float cyn_k;
+
+        float blu_c;
+        float blu_m;
+        float blu_y;
+        float blu_k;
+
+        float mag_c;
+        float mag_m;
+        float mag_y;
+        float mag_k;
+
+        float blk_c;
+        float blk_m;
+        float blk_y;
+        float blk_k;
+
+        float neu_c;
+        float neu_m;
+        float neu_y;
+        float neu_k;
+
+        float wht_c;
+        float wht_m;
+        float wht_y;
+        float wht_k;
+
+        bool relative;
+
+    void process() {
+        SampleType(src) input = src();
+
+        float3 rgb(input.x, input.y, input.z);
+
+        float min_v = min(rgb.x, min(rgb.y, rgb.z));
+        float max_v = max(rgb.x, max(rgb.y, rgb.z));
+        float mid_v = (rgb.x + rgb.y + rgb.z) - min_v - max_v;
+
+        float s_rgb = max_v - mid_v;
+        float s_cmy = mid_v - min_v;
+        float s_neu = 1.0f - (fabs(max_v - 0.5f) + fabs(min_v - 0.5f));
+        float s_wht = (min_v - 0.5f) * 2.0f;
+        float s_blk = (0.5f - max_v) * 2.0f;
+
+        float3 ts = rgb;
+
+        if (max_v == rgb.x) {
+            ts.x = ts.x + adjust(s_rgb, ts.x, red_c, red_k, relative);
+            ts.y = ts.y + adjust(s_rgb, ts.y, red_m, red_k, relative);
+            ts.z = ts.z + adjust(s_rgb, ts.z, red_y, red_k, relative);
+        }
+
+        if (min_v == rgb.z) {
+            ts.x = ts.x + adjust(s_cmy, ts.x, yel_c, yel_k, relative);
+            ts.y = ts.y + adjust(s_cmy, ts.y, yel_m, yel_k, relative);
+            ts.z = ts.z + adjust(s_cmy, ts.z, yel_y, yel_k, relative);
+        }
+
+        if (max_v == rgb.y) {
+            ts.x = ts.x + adjust(s_rgb, ts.x, grn_c, grn_k, relative);
+            ts.y = ts.y + adjust(s_rgb, ts.y, grn_m, grn_k, relative);
+            ts.z = ts.z + adjust(s_rgb, ts.z, grn_y, grn_k, relative);
+        }
+
+        if (min_v == rgb.x) {
+            ts.x = ts.x + adjust(s_cmy, ts.x, cyn_c, cyn_k, relative);
+            ts.y = ts.y + adjust(s_cmy, ts.y, cyn_m, cyn_k, relative);
+            ts.z = ts.z + adjust(s_cmy, ts.z, cyn_y, cyn_k, relative);
+        }
+
+        if (max_v == rgb.z) {
+            ts.x = ts.x + adjust(s_rgb, ts.x, blu_c, blu_k, relative);
+            ts.y = ts.y + adjust(s_rgb, ts.y, blu_m, blu_k, relative);
+            ts.z = ts.z + adjust(s_rgb, ts.z, blu_y, blu_k, relative);
+        }
+
+        if (min_v == rgb.y) {
+            ts.x = ts.x + adjust(s_cmy, ts.x, mag_c, mag_k, relative);
+            ts.y = ts.y + adjust(s_cmy, ts.y, mag_m, mag_k, relative);
+            ts.z = ts.z + adjust(s_cmy, ts.z, mag_y, mag_k, relative);
+        }
+
+        if (min_v >= 0.5f) {
+            ts.x = ts.x + adjust(s_wht, ts.x, wht_c, wht_k, relative);
+            ts.y = ts.y + adjust(s_wht, ts.y, wht_m, wht_k, relative);
+            ts.z = ts.z + adjust(s_wht, ts.z, wht_y, wht_k, relative);
+        }
+
+        if (max_v > 0.0f && min_v < 1.0f) {
+            ts.x = ts.x + adjust(s_neu, ts.x, neu_c, neu_k, relative);
+            ts.y = ts.y + adjust(s_neu, ts.y, neu_m, neu_k, relative);
+            ts.z = ts.z + adjust(s_neu, ts.z, neu_y, neu_k, relative);
+        }
+
+        if (max_v < 0.5f) {
+            ts.x = ts.x + adjust(s_blk, ts.x, blk_c, blk_k, relative);
+            ts.y = ts.y + adjust(s_blk, ts.y, blk_m, blk_k, relative);
+            ts.z = ts.z + adjust(s_blk, ts.z, blk_y, blk_k, relative);
+        }
+
+        dst() = float4(ts.x, ts.y, ts.z, input.w);
+    }
+};
